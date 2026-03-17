@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>תרגול: פירוק פרומפט אקדמי</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 40px;
+            color: #2D3436;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #003366 0%, #004a94 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 51, 102, 0.3);
+            margin-bottom: 20px;
+        }
+        .header h3 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        .instructions {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: #2D3436;
+        }
+        .labels-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #fcfcfc;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            justify-content: center;
+            min-height: 50px;
+        }
+        .label {
+            background-color: #003366; /* הצבע הכהה של המותג */
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            cursor: grab;
+            user-select: none;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .label:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        .text-container {
+            font-size: 1.25rem;
+            line-height: 3.5; /* מרווח גדול בין שורות */
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            position: relative;
+        }
+        .text-container h4 {
+            margin-top: 0;
+            color: #003366;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .text-segment {
+            display: inline;
+            border-radius: 4px;
+            transition: background-color 0.3s, border-bottom-color 0.3s;
+            position: relative;
+            padding: 2px 0;
+            border-bottom: 2px solid transparent; /* הכנה לקו הצבעוני */
+        }
+        .text-segment.drag-over {
+            background-color: #e2e8f0;
+            cursor: pointer;
+        }
+        .solved-text {
+            background-color: #F2F7FB; /* התכלת הבהיר של המותג */
+            padding: 2px 4px;
+            border-bottom: 2px solid #ED6C44 !important; /* הכתום של המותג */
+        }
+        .solved-badge {
+            display: inline-block;
+            background-color: #003366; /* כחול כהה לתווית שמעל הטקסט */
+            color: white;
+            font-size: 0.85rem;
+            padding: 3px 12px;
+            border-radius: 12px;
+            margin-left: 6px;
+            vertical-align: middle;
+            transform: translateY(-12px);
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .feedback-box {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #FDF2F0;
+            color: #2D3436;
+            border-right: 6px solid #ED6C44;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .feedback-box strong {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #d35400;
+        }
+        .error-flash {
+            background-color: #fee2e2 !important;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .reset-btn:hover {
+            background-color: #004a94;
+        }
+        .reset-btn:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h3>תרגול: פירוק פרומפט אקדמי</h3>
+    </div>
+    
+    <p class="instructions">קראו את הפרומפט הבא. נתחו את חלקיו וגררו את התווית המתאימה אל מעל הקטע המדויק בפסקה.</p>
+
+    <!-- בנק תוויות - עיצוב אחיד ונקי עם צבעי המותג -->
+    <div class="labels-bank" id="labelsArea">
+        <div class="label" draggable="true" id="target">קהל יעד</div>
+        <div class="label" draggable="true" id="role">תפקיד הבינה המלאכותית</div>
+        <div class="label" draggable="true" id="structure">מבנה</div>
+        <div class="label" draggable="true" id="context">עיגון בחומר לימוד</div>
+        <div class="label" draggable="true" id="style">היקף, טון וסגנון</div>
+    </div>
+
+    <div class="text-container">
+        <h4>פסקה לניתוח:</h4>
+        
+        <div class="text-segment" data-expected="target">
+            <span class="badge-placeholder"></span>
+            אני סטודנט שנה א' בקורס מבוא לסוציולוגיה
+        </div>
+        שמתקשה להבין את ההבדל בין פונקציה גלויה לבין פונקציה סמויה אצל רוברט מרטון. 
+        
+        <div class="text-segment" data-expected="role">
+            <span class="badge-placeholder"></span>
+            פעל כמתרגל מנוסה בקורס
+        </div>, 
+        וצור עבורי 
+        
+        <div class="text-segment" data-expected="structure">
+            <span class="badge-placeholder"></span>
+            טבלת השוואה
+        </div> 
+        פשוטה בין שני המושגים שכוללת דוגמאות ממגוון תחומים, 
+        
+        <div class="text-segment" data-expected="context">
+            <span class="badge-placeholder"></span>
+            על בסיס ההגדרה המצורפת במצגת
+        </div>. 
+        
+        <div class="text-segment" data-expected="style">
+            <span class="badge-placeholder"></span>
+            הטבלה צריכה להיות תמציתית (עד 200 מילים) וכתובה בשפה יומיומית וברורה.
+        </div>
+    </div>
+
+    <!-- אזור משוב שכולל גם את כפתור האיפוס -->
+    <div class="feedback-box" id="feedbackMessage">
+        <strong>כל הכבוד! הצלחתם לזהות את כל חלקי הפרומפט. 🎉</strong><br>
+        זהו המתכון לתוצר איכותי שבאמת משרת את הלמידה שלכם.<br>
+        <button class="reset-btn" id="resetBtn">התחילו מחדש 🔄</button>
+    </div>
+</div>
+
+<script>
+    const labels = document.querySelectorAll('.label');
+    const segments = document.querySelectorAll('.text-segment');
+    const feedbackBox = document.getElementById('feedbackMessage');
+    const resetBtn = document.getElementById('resetBtn');
+    
+    let solvedCount = 0;
+    const totalCount = labels.length;
+
+    // הגדרת הגרירה של התוויות
+    labels.forEach(label => {
+        label.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        });
+    });
+
+    // הגדרת אזורי השחרור על הטקסט
+    segments.forEach(segment => {
+        segment.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!segment.classList.contains('solved-text')) {
+                segment.classList.add('drag-over');
+            }
+        });
+
+        segment.addEventListener('dragleave', () => {
+            segment.classList.remove('drag-over');
+        });
+
+        segment.addEventListener('drop', (e) => {
+            e.preventDefault();
+            segment.classList.remove('drag-over');
+            
+            // מניעת דריסה אם כבר נפתר
+            if (segment.classList.contains('solved-text')) return;
+            
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const expectedId = segment.getAttribute('data-expected');
+            
+            if (draggedId === expectedId) {
+                const draggedLabel = document.getElementById(draggedId);
+                
+                // יצירת התווית הקטנה
+                const badge = document.createElement('span');
+                badge.className = 'solved-badge';
+                badge.textContent = draggedLabel.textContent;
+                
+                const placeholder = segment.querySelector('.badge-placeholder');
+                placeholder.appendChild(badge);
+                
+                // עיצוב הטקסט המסומן עם קו תחתון מובנה ב-CSS
+                segment.classList.add('solved-text');
+                
+                // הסתרת התווית מבנק התוויות
+                draggedLabel.style.display = 'none';
+                
+                solvedCount++;
+                if (solvedCount === totalCount) {
+                    feedbackBox.style.display = 'block';
+                    // גלילה חלקה למטה כדי לראות את המשוב
+                    feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            } else {
+                // טעות - הבהוב אדום
+                segment.classList.add('error-flash');
+                setTimeout(() => {
+                    if (!segment.classList.contains('solved-text')) {
+                        segment.classList.remove('error-flash');
+                    }
+                }, 400);
+            }
+        });
+    });
+
+    // פונקציית איפוס - "התחילו מחדש"
+    resetBtn.addEventListener('click', () => {
+        // איפוס מונה ומשוב
+        solvedCount = 0;
+        feedbackBox.style.display = 'none';
+
+        // החזרת כל התוויות לבנק
+        labels.forEach(label => {
+            label.style.display = 'block';
+        });
+
+        // ניקוי כל אזורי הטקסט
+        segments.forEach(segment => {
+            segment.classList.remove('solved-text', 'error-flash');
+            const placeholder = segment.querySelector('.badge-placeholder');
+            placeholder.innerHTML = ''; // מחיקת התווית הקטנה
+        });
+    });
+</script>
+
+</body>
+</html>
